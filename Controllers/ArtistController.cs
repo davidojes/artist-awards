@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using ArtistAwards.Services;
+
+namespace DotNetAPI
+{
+  [Route("api/[controller]")]
+  [ApiController]
+  public class ArtistController : ControllerBase
+  {
+    public ArtistController(ArtistService _artistService)
+    {
+      ArtistService = _artistService;
+    }
+
+    public ArtistService ArtistService;
+
+    [HttpGet]
+    public IEnumerable<Artist> Get()
+    {
+      return ArtistService.GetArtists();
+      //string artistsJson = JsonSerializer.Serialize(ArtistService.GetArtists());
+      //return artistsJson;
+    }
+
+    [Route("vote")]
+    [HttpPost]
+    public async Task VoteAsync([FromBody] Artist artist)
+    {
+      await ArtistService.VoteAsync(artist.Id);
+      //return Ok();
+
+    }
+  }
+}
