@@ -21,9 +21,18 @@ namespace DotNetAPI
     public ArtistService ArtistService;
 
     [HttpGet]
-    public IEnumerable<Artist> Get()
+    public IEnumerable<Artist> GetArtists()
     {
       return ArtistService.GetArtists();
+      //string artistsJson = JsonSerializer.Serialize(ArtistService.GetArtists());
+      //return artistsJson;
+    }
+
+    [RouteAttribute("{id}")]
+    [HttpGet]
+    public async Task<Artist> GetArtist(int id)
+    {
+      return await ArtistService.GetArtist(id);
       //string artistsJson = JsonSerializer.Serialize(ArtistService.GetArtists());
       //return artistsJson;
     }

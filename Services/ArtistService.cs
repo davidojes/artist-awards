@@ -34,6 +34,12 @@ namespace ArtistAwards.Services
       return Artists;
     }
 
+    public async Task<Artist> GetArtist(int id)
+    {
+      Artist artist = await ArtistContext.Artists.FindAsync(id) ;
+      return artist;
+    }
+
     //public async Task<List<Artist>> GetArtists()
     //{
     //  Artists = await ArtistContext.Artists.ToListAsync();
