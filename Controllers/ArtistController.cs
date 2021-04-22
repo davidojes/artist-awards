@@ -28,6 +28,14 @@ namespace DotNetAPI
       //return artistsJson;
     }
 
+    [HttpPost]
+    public async Task<Artist> CreateArtist([FromBody] Artist artist)
+    {
+      await ArtistService.CreateArtist(artist);
+
+      return artist;
+    }
+
     [Route("vote")]
     [HttpPost]
     public async Task VoteAsync([FromBody] Artist artist)

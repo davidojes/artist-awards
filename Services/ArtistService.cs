@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks; 
+using System.Threading.Tasks;
 
 namespace ArtistAwards.Services
 {
@@ -40,40 +40,22 @@ namespace ArtistAwards.Services
     //  return Artists;
     //}
 
+    public async Task<Artist> CreateArtist(Artist artist)
+    {
+      ArtistContext.Add(artist);
+      await ArtistContext.SaveChangesAsync();
+
+      return artist;
+    }
+
     public async Task VoteAsync(int id)
     {
 
       Artist artistToVote = await ArtistContext.Artists.FindAsync(id);
-
-      //if (artistToVote == null)
-      //{
-      //  return NotFound();
-      //}
-
       artistToVote.Votes += 1;
 
-
       await ArtistContext.SaveChangesAsync();
-      
-
-      //List<Artist> artists = await GetArtists();
-
-      //Artist artist = artists.First(a => a.Id == id);
-      //artist.Votes += 1;
-      //artists.First(a => a.Id == id).Votes = artist.Votes;
-
-      //using (var outputStream = File.OpenWrite(JsonFileName))
-      //{
-      //  JsonSerializer.Serialize<IEnumerable<Artist>>(
-      //      new Utf8JsonWriter(outputStream, new JsonWriterOptions
-      //      {
-      //        SkipValidation = true,
-      //        Indented = true
-      //      }),
-      //      artists
-      //  );
-      //}
-
     }
+
   }
 }
