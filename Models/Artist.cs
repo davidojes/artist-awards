@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -11,6 +12,7 @@ namespace DotNetAPI
   {
     // JsonPropertyName maps an object field to JSON names
     [JsonPropertyName("id")]
+    [Key]
     public int Id { get; set; }
     [JsonPropertyName("name")]
     public string Name { get; set; }
