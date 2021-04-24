@@ -53,7 +53,7 @@ namespace DotNetAPI
         ValidateIssuerSigningKey = true,
         ValidIssuer = "http://localhost:5000",
         ValidAudience = "http://localhost:5000",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secretkey"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secretkey1234567"))
       };
     });
     }

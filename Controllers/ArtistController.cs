@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ArtistAwards.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DotNetAPI
 {
@@ -46,7 +47,7 @@ namespace DotNetAPI
     }
 
     [Route("vote")]
-    [HttpPost]
+    [HttpPost, Authorize]
     public async Task<StatusCodeResult> VoteAsync([FromBody] Artist artist)
     {
       await ArtistService.VoteAsync(artist.Id);
