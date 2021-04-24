@@ -3,12 +3,11 @@
     .then(response => response.json())
     .then(artists => displayArtists(artists))
   //resolve(alert("Artists fetched successfully"));
-  $(document).ready(function () {
-    ($(".loader-wrapper").fadeOut("slow"));
-  });
 });
 
-displayArtistsPromise.then();
+displayArtistsPromise.then($(document).ready(function () {
+  ($(".loader-wrapper").fadeOut("slow"));
+}));
 
 
 var artistsContainer = document.getElementById("artistsContainer");
