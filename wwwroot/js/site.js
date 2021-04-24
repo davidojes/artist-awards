@@ -1,15 +1,20 @@
 ﻿let displayArtistsPromise = new Promise(function (resolve, reject) {
   fetch('/api/artist')
     .then(response => response.json())
-    .then(artists => displayArtists(artists))
+    .then(artists => { displayArtists(artists); artistArray = artists })
   //resolve(alert("Artists fetched successfully"));
 });
 
 displayArtistsPromise.then($(document).ready(function () {
-  ($(".loader-wrapper").fadeOut("slow"));
+  var checkExist = setInterval(function () {
+    if (document.querySelector(`[data-idButton="${artistArray[artistArray.length - 1].id}"]`)) {
+      ($(".loader-wrapper").fadeOut("slow"));
+    }
+  }, 1000);
 }));
 
 
+var artistArray = null;
 var artistsContainer = document.getElementById("artistsContainer");
 var voteButtons;
 var voteCheck = JSON.parse(localStorage.getItem("voteCheck"));
