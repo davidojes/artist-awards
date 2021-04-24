@@ -1,4 +1,6 @@
-﻿html {
+﻿@import url("loading-animation.css");
+
+html {
   font-family: 'Roboto', sans-serif;
 }
 

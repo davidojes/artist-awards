@@ -47,10 +47,10 @@ namespace DotNetAPI
 
     [Route("vote")]
     [HttpPost]
-    public async Task VoteAsync([FromBody] Artist artist)
+    public async Task<StatusCodeResult> VoteAsync([FromBody] Artist artist)
     {
       await ArtistService.VoteAsync(artist.Id);
-      //return Ok();
+      return Ok();
 
     }
   }

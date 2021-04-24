@@ -1,4 +1,17 @@
-﻿var artistsContainer = document.getElementById("artistsContainer");
+﻿let displayArtistsPromise = new Promise(function (resolve, reject) {
+  fetch('/api/artist')
+    .then(response => response.json())
+    .then(artists => displayArtists(artists))
+  //resolve(alert("Artists fetched successfully"));
+  $(document).ready(function () {
+    ($(".loader-wrapper").fadeOut("slow"));
+  });
+});
+
+displayArtistsPromise.then();
+
+
+var artistsContainer = document.getElementById("artistsContainer");
 var voteButtons;
 var voteCheck = JSON.parse(localStorage.getItem("voteCheck"));
 
@@ -6,10 +19,6 @@ if (voteCheck == null) {
   voteCheck = { voted: false, artistId: -1 };
 }
 
-
-fetch('/api/artist')
-  .then(response => response.json())
-  .then(artists => displayArtists(artists))
 
 function displayArtists(artistArray) {
   console.log(artistArray);
@@ -42,7 +51,7 @@ function setupVoteButtons() {
 
 function vote(id) {
   var idJson = { Id: id };
-  
+
 
   if (voteCheck.voted == true) {
     alert("Sorry, you have already voted");
@@ -110,10 +119,9 @@ function createVoteButton(artistName, artistId) {
   var voteButton = document.createElement("button");
   voteButton.innerHTML = "Vote for " + artistName;
   voteButton.classList.add("vote-button");
-  if (artistId == voteCheck.artistId)
-    {
-      voteButton.classList.add("voted-button");
-    }
+  if (artistId == voteCheck.artistId) {
+    voteButton.classList.add("voted-button");
+  }
   voteButton.setAttribute("data-idButton", artistId);
   return voteButton;
 }
