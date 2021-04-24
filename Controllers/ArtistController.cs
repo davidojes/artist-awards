@@ -38,7 +38,7 @@ namespace DotNetAPI
       //return artistsJson;
     }
 
-    [HttpPost]
+    [HttpPost, Authorize(Roles = "manager")]
     public async Task<Artist> CreateArtist([FromBody] Artist artist)
     {
       await ArtistService.CreateArtist(artist);
@@ -47,7 +47,7 @@ namespace DotNetAPI
     }
 
     [Route("vote")]
-    [HttpPost, Authorize]
+    [HttpPost, Authorize(Roles = "voter")]
     public async Task<StatusCodeResult> VoteAsync([FromBody] Artist artist)
     {
       await ArtistService.VoteAsync(artist.Id);
