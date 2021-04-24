@@ -10,7 +10,7 @@ displayArtistsPromise.then($(document).ready(function () {
     if (document.querySelector(`[data-idButton="${artistArray[artistArray.length - 1].id}"]`)) {
       ($(".loader-wrapper").fadeOut("slow"));
     }
-  }, 1000);
+  }, 100);
 }));
 
 
