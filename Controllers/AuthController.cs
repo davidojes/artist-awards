@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,20 @@ namespace ArtistAwards.Controllers
   [ApiController]
   public class AuthController : ControllerBase
   {
+    public AuthController(IConfiguration configuration)
+    {
+      Config = configuration;
+    }
+
+    private IConfiguration Config { get; }
+
+
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel user)
     {
       if (user.UserName == "david" && user.Password == "pass")
       {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("secretkey1234567"));
+        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
         var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
         var claims = new List<Claim>()
         {
