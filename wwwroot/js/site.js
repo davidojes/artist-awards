@@ -1,32 +1,75 @@
-﻿let displayArtistsPromise = new Promise(function (resolve, reject) {
-  fetch('/api/artist')
-    .then(response => response.json())
-    .then(artists => { displayArtists(artists); artistArray = artists })
-  //resolve(alert("Artists fetched successfully"));
-});
-
-displayArtistsPromise.then($(document).ready(function () {
-  var checkExist = setInterval(function () {
-    if (document.querySelector(`[data-idButton="${artistArray[artistArray.length - 1].id}"]`)) {
-      ($(".loader-wrapper").fadeOut("slow"));
-    }
-  }, 100);
-}));
+﻿
 
 
-var artistArray = null;
+//var artists = [{"id": -1, "name": "Test", "votes": -1}];
+var artists = [];
 var artistsContainer = document.getElementById("artistsContainer");
 var voteButtons;
 var voteCheck = JSON.parse(localStorage.getItem("voteCheck"));
+var lastFetch = new Date(sessionStorage.getItem("lastFetch"));
+var currentDate = new Date();
 
 if (voteCheck == null) {
   voteCheck = { voted: false, artistId: -1 };
 }
 
+/*
+ * this code sets up the UI
+ */
 
-function displayArtists(artistArray) {
-  console.log(artistArray);
-  artistArray.forEach(function (artist) {
+let displayArtistsPromise = new Promise(function (resolve, reject) {
+  let tempArtists = JSON.parse(sessionStorage.getItem("artists"));
+  if (tempArtists) {
+    if (checkLastFetch() < 2) {
+      artists = tempArtists;
+    }
+    else {
+      console.log("time for refresh");
+      fetchArtists();
+    }
+  }
+  else {
+    fetchArtists();
+  }
+
+  let checkArtists = setInterval(function () {
+    if (artists.length != 0) {
+      displayArtists(artists);
+      clearInterval(checkArtists);
+    }
+  }, 100);
+});
+
+displayArtistsPromise.then($(document).ready(function () {
+  let checkExist = setInterval(function () {
+    if (artists.length != 0) {
+      if (document.querySelector(`[data-idButton="${artists[artists.length - 1].id}"]`)) {
+        ($(".loader-wrapper").fadeOut("slow"));
+      }
+    }
+  }, 100);
+}));
+
+/*
+ * end of setup
+ */
+
+
+/*
+ * function that fetches all artists from the backend and caches them
+ */
+function fetchArtists() {
+  fetch('/api/artist')
+    .then(response => response.json())
+    .then(tempArtists => { artists = tempArtists; sessionStorage.setItem("artists", JSON.stringify(artists)) })
+    .then(sessionStorage.setItem("lastFetch", JSON.stringify(new Date())))
+}
+
+/*
+ * function that displays all the UI that the user sees
+ */
+function displayArtists(artists) {
+  artists.forEach(function (artist) {
     var artistDiv = document.createElement("div");
     artistDiv.classList.add("artist-div");
     artistDiv.appendChild(createNameSpan(artist.name));
@@ -42,17 +85,9 @@ function displayArtists(artistArray) {
   setupVoteButtons();
 }
 
-
-function setupVoteButtons() {
-  voteButtons = Array.from(document.getElementsByClassName("vote-button"));
-
-  voteButtons.forEach(function (voteButton) {
-    var id = parseInt(voteButton.getAttribute("data-idButton"), 10);
-    voteButton.addEventListener("click", function () { vote(id) });
-  });
-}
-
-
+/*
+ * function that is used to cast a user vote
+ */
 function vote(id) {
   var idJson = { Id: id };
 
@@ -71,9 +106,45 @@ function vote(id) {
       .then(updateVoteSpan(document.querySelector(`[data-idSpan="${id}"]`)))
       .then(updateVoteButton(document.querySelector(`[data-idButton="${id}"]`)))
       .then(storeVote(id));
+
+    clearLastFetch();
   }
 }
 
+
+
+/*******************************
+ * 
+ * utility functions
+ * 
+ *******************************/
+
+/*
+ * function that checks the difference between the time of the last data fetch and current time and returns it in minutes
+ */
+function checkLastFetch() {
+  if (!JSON.parse(sessionStorage.getItem("lastFetch"))) { return 2; }
+  let lastFetch = new Date(JSON.parse(sessionStorage.getItem("lastFetch")));
+  console.log(lastFetch);
+  let diff = Math.abs(new Date() - lastFetch);
+  let diffMinutes = Math.floor((diff / 1000) / 60);
+  console.log(diffMinutes + " minute(s)");
+  return diffMinutes;
+}
+
+function clearLastFetch() {
+  let pastTime = new Date(currentDate.getTime() - 5 * 60000);
+  sessionStorage.setItem("lastFetch", JSON.stringify(pastTime));
+}
+
+function setupVoteButtons() {
+  voteButtons = Array.from(document.getElementsByClassName("vote-button"));
+
+  voteButtons.forEach(function (voteButton) {
+    var id = parseInt(voteButton.getAttribute("data-idButton"), 10);
+    voteButton.addEventListener("click", function () { vote(id) });
+  });
+}
 
 function updateVoteSpan(voteSpan) {
   let oldVote = voteSpan.innerHTML.trim();
@@ -100,9 +171,6 @@ function clearStorage() {
   alert("Local Storage Cleared");
 }
 
-
-
-// utility functions
 function createNameSpan(artistName) {
   var nameSpan = document.createElement("span");
   nameSpan.classList.add("name-span");
