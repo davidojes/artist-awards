@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DotNetAPI;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ArtistAwards.Models;
 
 namespace ArtistAwards.Data
 {
-  public class ArtistContext : DbContext
+  public class ArtistContext : IdentityDbContext<User, Role, int>
   {
     public ArtistContext(DbContextOptions<ArtistContext> options)
         : base(options)

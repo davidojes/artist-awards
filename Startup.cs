@@ -16,6 +16,8 @@ using ArtistAwards.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ArtistAwards.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DotNetAPI
 {
@@ -36,6 +38,13 @@ namespace DotNetAPI
 
       services.AddDbContext<ArtistContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("ArtistContext")));
+
+      services.AddIdentity<User, Role>(options =>
+      {
+        options.SignIn.RequireConfirmedAccount = false;
+      })
+            .AddEntityFrameworkStores<ArtistContext>()
+            .AddDefaultTokenProviders();
 
       //Authentication
       services.AddAuthentication(opt =>
