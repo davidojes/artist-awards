@@ -16,7 +16,7 @@ using ArtistAwards.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using ArtistAwards.Models;
+using ArtistAwards;
 using Microsoft.AspNetCore.Identity;
 
 namespace DotNetAPI
