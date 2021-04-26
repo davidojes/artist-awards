@@ -83,7 +83,7 @@ namespace ArtistAwards.Data
         entity.Property(e => e.Passwordhash)
             .IsRequired()
             .HasColumnName("passwordhash")
-            .HasMaxLength(32);
+            .HasMaxLength(100);
       });
 
       //OnModelCreatingPartial(modelBuilder);
