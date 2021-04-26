@@ -9,7 +9,7 @@ using ArtistAwards.Models;
 
 namespace ArtistAwards.Data
 {
-  public class ArtistContext : IdentityDbContext<User, Role, int>
+  public class ArtistContext : DbContext
   {
     public ArtistContext(DbContextOptions<ArtistContext> options)
         : base(options)
@@ -23,6 +23,9 @@ namespace ArtistAwards.Data
       modelBuilder.Entity<Artist>().ToTable("Artists");
       modelBuilder.Entity<Artist>()
     .Property(e => e.Id)
+    .ValueGeneratedOnAdd();
+      modelBuilder.Entity<User>()
+    .Property(u => u.Id)
     .ValueGeneratedOnAdd();
     }
   }

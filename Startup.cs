@@ -39,13 +39,6 @@ namespace DotNetAPI
       services.AddDbContext<ArtistContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("ArtistContext")));
 
-      services.AddIdentity<User, Role>(options =>
-      {
-        options.SignIn.RequireConfirmedAccount = false;
-      })
-            .AddEntityFrameworkStores<ArtistContext>()
-            .AddDefaultTokenProviders();
-
       //Authentication
       services.AddAuthentication(opt =>
       {
