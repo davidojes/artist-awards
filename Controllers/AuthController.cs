@@ -30,31 +30,32 @@ namespace ArtistAwards.Controllers
 
 
     [HttpPost, Route("login")]
-    public IActionResult Login([FromBody] LoginModel user)
+    public IActionResult Login([FromBody] LoginModel model)
     {
-      if (user.UserName == "david" && user.Password == "pass")
+      var user = UserService.AuthenticateUser(model.Email, model.Password);
+      if (user == null)
+        return BadRequest(new { message = "Username or password is incorrect" });
+
+      var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
+      var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+      var roles = UserService.GetUserRoles(user.Id);
+      var claims = new List<Claim>();
+      foreach (Role role in roles)
       {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
-        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-        var claims = new List<Claim>()
-        {
-          new Claim(ClaimTypes.Name, user.UserName),
-          new Claim(ClaimTypes.Role, "voter")
-        };
-        var tokeOptions = new JwtSecurityToken(
-            issuer: "http://localhost:5000",
-            audience: "http://localhost:5000",
-            claims: claims,
-            expires: DateTime.Now.AddMinutes(120),
-            signingCredentials: signinCredentials
-        );
-        var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-        return Ok(new { Token = tokenString });
+        var claim = new Claim(ClaimTypes.Role, role.Name);
+        claims.Add(claim);
       }
-      else
-      {
-        return Unauthorized();
-      }
+      var tokeOptions = new JwtSecurityToken(
+          issuer: "http://localhost:5000",
+          audience: "http://localhost:5000",
+          claims: claims,
+          expires: DateTime.Now.AddMinutes(120),
+          signingCredentials: signinCredentials
+      );
+      var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
+      return Ok(new { Token = tokenString });
+
+
     }
 
     [HttpPost, Route("register")]
@@ -72,7 +73,7 @@ namespace ArtistAwards.Controllers
 
   public class LoginModel
   {
-    public string UserName { get; set; }
+    public string Email { get; set; }
     public string Password { get; set; }
   }
 

@@ -7,12 +7,25 @@ using System.Collections.Generic;
 
 namespace ArtistAwards
 {
-    public partial class UserRole
-    {
-        public int Userid { get; set; }
-        public int Roleid { get; set; }
+  public partial class UserRole
+  {
+    public int Userid { get; set; }
+    public int Roleid { get; set; }
 
-        public virtual Role Role { get; set; }
-        public virtual User User { get; set; }
+    //public virtual Role Role { get; set; }
+    //public virtual User User { get; set; }
+    public virtual Role Role { get; set; }
+    public virtual User User { get; set; }
+
+    public UserRole()
+    {
     }
+
+
+    public UserRole(int roleId, int userId)
+    {
+      Userid = userId;
+      Roleid = roleId;
+    }
+  }
 }
