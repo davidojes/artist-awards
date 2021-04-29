@@ -36,8 +36,10 @@ namespace ArtistAwards.Services
 
     public async Task<User> CreateUser(User user)
     {
-      UserRole ur = new UserRole(1, user.Id);
       ArtistContext.Users.Add(user);
+      await ArtistContext.SaveChangesAsync();
+      User registeredUser = ArtistContext.Users.SingleOrDefault(u => u.Email == user.Email);
+      UserRole ur = new UserRole(1, registeredUser.Id);
       ArtistContext.Userroles.Add(ur);
       await ArtistContext.SaveChangesAsync();
 
