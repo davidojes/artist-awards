@@ -59,6 +59,16 @@ namespace DotNetAPI
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SecretKey")))
       };
     });
+
+      services.AddCors(options =>
+      {
+        options.AddPolicy("EnableCORS", builder =>
+        {
+          builder.AllowAnyOrigin()
+             .AllowAnyHeader()
+             .AllowAnyMethod();
+        });
+      });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,6 +88,7 @@ namespace DotNetAPI
 
       app.UseAuthentication();
       app.UseAuthorization();
+      app.UseCors("EnableCORS");
 
       app.UseEndpoints(endpoints =>
       {
