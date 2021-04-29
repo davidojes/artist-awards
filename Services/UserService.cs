@@ -48,6 +48,11 @@ namespace ArtistAwards.Services
     {
       var user =  ArtistContext.Users.SingleOrDefault(u => u.Email == email);
 
+      if(user == null)
+      {
+        return null;
+      }
+
       if (!BC.Verify(password, user.Passwordhash))
         return null;
 

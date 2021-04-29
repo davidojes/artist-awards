@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
 
@@ -32,9 +33,21 @@ namespace ArtistAwards.Controllers
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel model)
     {
+      Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+      Match emailMatch = regex.Match(model.Email);
+
+      if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
+      {
+        return BadRequest(new { message = "Email and Password must be filled" });
+      }
+      if (!emailMatch.Success)
+      {
+        return BadRequest(new { message = "Invalid Email" });
+      }
+
       var user = UserService.AuthenticateUser(model.Email, model.Password);
       if (user == null)
-        return BadRequest(new { message = "Username or password is incorrect" });
+        return BadRequest(new { message = "Email or Password is incorrect" });
 
       var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
       var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
@@ -61,6 +74,17 @@ namespace ArtistAwards.Controllers
     [HttpPost, Route("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
+      Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+      Match emailMatch = regex.Match(model.Email);
+
+      if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.Name))
+      {
+        return BadRequest(new { message = "Name, Email, and Password must be filled" });
+      }
+      if (!emailMatch.Success)
+      {
+        return BadRequest(new { message = "Invalid Email" });
+      }
 
       var user = new User { Name = model.Name, Email = model.Email };
       string passwordHash = BC.HashPassword(model.Password);
