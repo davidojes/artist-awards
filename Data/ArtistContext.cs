@@ -43,7 +43,7 @@ namespace ArtistAwards.Data
 
       modelBuilder.Entity<UserRole>(entity =>
       {
-        entity.HasNoKey();
+        entity.Property(e => e.Id).HasColumnName("id");
 
         entity.ToTable("userroles");
 

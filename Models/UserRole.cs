@@ -9,6 +9,7 @@ namespace ArtistAwards
 {
   public partial class UserRole
   {
+    public int Id { get; set; }
     public int Userid { get; set; }
     public int Roleid { get; set; }
 
