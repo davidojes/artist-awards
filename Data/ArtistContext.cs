@@ -21,6 +21,11 @@ namespace ArtistAwards.Data
     public virtual DbSet<User> Users { get; set; }
     public DbSet<Artist> Artists { get; set; }
 
+    public virtual DbSet<PollOption> PollOptions { get; set; }
+    public virtual DbSet<PollStatus> PollStatuses { get; set; }
+    public virtual DbSet<Poll> Polls { get; set; }
+    public virtual DbSet<UserVotes> UserVotes { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
       modelBuilder.Entity<Artist>().ToTable("Artists");
@@ -85,6 +90,99 @@ namespace ArtistAwards.Data
             .HasColumnName("passwordhash")
             .HasMaxLength(100);
       });
+
+      modelBuilder.HasPostgresExtension("uuid-ossp");
+
+      modelBuilder.Entity<PollOption>(entity =>
+      {
+        entity.ToTable("poll_options");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .UseIdentityAlwaysColumn();
+
+        entity.Property(e => e.Content)
+            .IsRequired()
+            .HasColumnName("content")
+            .HasColumnType("character varying");
+
+        entity.Property(e => e.PollId).HasColumnName("poll_id");
+
+        entity.Property(e => e.Votes)
+            .HasColumnName("votes")
+            .HasDefaultValueSql("0");
+
+        entity.HasOne(d => d.Poll)
+            .WithMany(p => p.PollOptions)
+            .HasForeignKey(d => d.PollId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("poll_options_poll_id_fkey");
+      });
+
+      modelBuilder.Entity<PollStatus>(entity =>
+      {
+        entity.ToTable("poll_statuses");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .UseIdentityAlwaysColumn();
+
+        entity.Property(e => e.Name)
+            .IsRequired()
+            .HasColumnName("name")
+            .HasColumnType("character varying");
+      });
+
+      modelBuilder.Entity<Poll>(entity =>
+      {
+        entity.ToTable("polls");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .HasDefaultValueSql("uuid_generate_v4()");
+
+        entity.Property(e => e.CreatorId).HasColumnName("creator_id");
+
+        entity.Property(e => e.StatusId).HasColumnName("status_id");
+
+        entity.Property(e => e.Title)
+            .IsRequired()
+            .HasColumnName("title")
+            .HasColumnType("character varying");
+
+        entity.HasOne(d => d.Status)
+            .WithMany(p => p.Polls)
+            .HasForeignKey(d => d.StatusId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("polls_status_id_fkey");
+      });
+
+      modelBuilder.Entity<UserVotes>(entity =>
+      {
+        entity.ToTable("user_votes");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .UseIdentityAlwaysColumn();
+
+        entity.Property(e => e.PollId).HasColumnName("poll_id");
+
+        entity.Property(e => e.PollOptionId).HasColumnName("poll_option_id");
+
+        entity.Property(e => e.UserId).HasColumnName("user_id");
+
+        entity.HasOne(d => d.Poll)
+            .WithMany(p => p.UserVotes)
+            .HasForeignKey(d => d.PollId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("user_votes_poll_id_fkey");
+
+        entity.HasOne(d => d.PollOption)
+            .WithMany(p => p.UserVotes)
+            .HasForeignKey(d => d.PollOptionId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("user_votes_poll_option_id_fkey");
+      //});
 
       //OnModelCreatingPartial(modelBuilder);
     }
