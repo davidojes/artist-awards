@@ -89,7 +89,11 @@ namespace ArtistAwards.Controllers
       var user = new User { Name = model.Name, Email = model.Email };
       string passwordHash = BC.HashPassword(model.Password);
       user.Passwordhash = passwordHash;
-      await UserService.CreateUser(user);
+      User checkUser = await UserService.CreateUser(user);
+      if (checkUser != null)
+      {
+        return BadRequest(new { message = "User already exists" });
+      }
       return Ok();
     }
   }
