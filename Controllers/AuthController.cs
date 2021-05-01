@@ -1,4 +1,5 @@
-﻿using ArtistAwards.Services;
+﻿using ArtistAwards.Data;
+using ArtistAwards.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +21,16 @@ namespace ArtistAwards.Controllers
   [ApiController]
   public class AuthController : ControllerBase
   {
-    public AuthController(IConfiguration configuration, UserService userService)
+    public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext)
     {
       Config = configuration;
       UserService = userService;
+      DbContext = dbContext;
     }
 
     private IConfiguration Config { get; }
     private UserService UserService;
-
+    private AppDbContext DbContext;
 
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel model)
@@ -89,11 +91,14 @@ namespace ArtistAwards.Controllers
       var user = new User { Name = model.Name, Email = model.Email };
       string passwordHash = BC.HashPassword(model.Password);
       user.Passwordhash = passwordHash;
-      User checkUser = await UserService.CreateUser(user);
+      User checkUser = DbContext.Users.SingleOrDefault(u => u.Email == user.Email);
       if (checkUser != null)
       {
         return BadRequest(new { message = "User already exists" });
       }
+
+      await UserService.CreateUser(user);
+
       return Ok();
     }
   }

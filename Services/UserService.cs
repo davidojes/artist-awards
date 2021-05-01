@@ -35,12 +35,7 @@ namespace ArtistAwards.Services
     }
 
     public async Task<User> CreateUser(User user)
-    {
-      User checkUser = ArtistContext.Users.SingleOrDefault(u => u.Email == user.Email);
-      if (checkUser != null)
-      {
-        return checkUser;
-      }
+    {     
       ArtistContext.Users.Add(user);
       await ArtistContext.SaveChangesAsync();
       User registeredUser = ArtistContext.Users.SingleOrDefault(u => u.Email == user.Email);

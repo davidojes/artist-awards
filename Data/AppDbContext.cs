@@ -182,7 +182,7 @@ namespace ArtistAwards.Data
             .HasForeignKey(d => d.PollOptionId)
             .OnDelete(DeleteBehavior.ClientSetNull)
             .HasConstraintName("user_votes_poll_option_id_fkey");
-      //});
+      });
 
       //OnModelCreatingPartial(modelBuilder);
     }
