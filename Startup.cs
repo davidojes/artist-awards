@@ -37,7 +37,7 @@ namespace DotNetAPI
       services.AddTransient<ArtistService>();
       services.AddTransient<UserService>();
 
-      services.AddDbContext<ArtistContext>(options =>
+      services.AddDbContext<AppDbContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("ArtistContext")));
 
       //Authentication

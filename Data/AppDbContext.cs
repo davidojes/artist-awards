@@ -9,9 +9,9 @@ using ArtistAwards;
 
 namespace ArtistAwards.Data
 {
-  public class ArtistContext : DbContext
+  public class AppDbContext : DbContext
   {
-    public ArtistContext(DbContextOptions<ArtistContext> options)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
     }

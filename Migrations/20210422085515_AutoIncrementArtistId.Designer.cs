@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ArtistAwards.Migrations
 {
-    [DbContext(typeof(ArtistContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20210422085515_AutoIncrementArtistId")]
     partial class AutoIncrementArtistId
     {

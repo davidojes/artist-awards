@@ -13,14 +13,14 @@ namespace ArtistAwards.Services
 {
   public class ArtistService
   {
-    public ArtistService(IWebHostEnvironment webHostEnvironment, ArtistContext context)
+    public ArtistService(IWebHostEnvironment webHostEnvironment, AppDbContext context)
     {
       WebHostEnvironment = webHostEnvironment;
       ArtistContext = context;
     }
 
     public IWebHostEnvironment WebHostEnvironment { get; }
-    private ArtistContext ArtistContext;
+    private AppDbContext ArtistContext;
     private IEnumerable<Artist> Artists;
 
     private string JsonFileName

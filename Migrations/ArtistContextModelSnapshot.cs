@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ArtistAwards.Migrations
 {
-    [DbContext(typeof(ArtistContext))]
+    [DbContext(typeof(AppDbContext))]
     partial class ArtistContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

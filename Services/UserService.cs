@@ -14,12 +14,12 @@ namespace ArtistAwards.Services
 {
   public class UserService
   {
-    public UserService( ArtistContext context)
+    public UserService( AppDbContext context)
     {
       ArtistContext = context;
     }
 
-    private ArtistContext ArtistContext;
+    private AppDbContext ArtistContext;
     private IEnumerable<User> Users;
 
     public IEnumerable<User> GetUsers()

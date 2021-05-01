@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ArtistAwards.Migrations
 {
-    [DbContext(typeof(ArtistContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20200602030714_Initial")]
     partial class Initial
     {

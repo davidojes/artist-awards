@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ArtistAwards.Migrations
 {
-    [DbContext(typeof(ArtistContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20210422075507_PostgreSQLSetup")]
     partial class PostgreSQLSetup
     {
