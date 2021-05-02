@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ArtistAwards;
 using Microsoft.AspNetCore.Identity;
+using PollAwards.Services;
 
 namespace DotNetAPI
 {
@@ -36,6 +37,7 @@ namespace DotNetAPI
       services.AddControllers();
       services.AddTransient<ArtistService>();
       services.AddTransient<UserService>();
+      services.AddTransient<PollService>();
 
       services.AddDbContext<AppDbContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("ArtistContext")));
@@ -69,6 +71,9 @@ namespace DotNetAPI
              .AllowAnyMethod();
         });
       });
+
+      services.AddControllersWithViews()
+        .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
