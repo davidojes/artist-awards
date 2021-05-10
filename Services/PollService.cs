@@ -28,6 +28,7 @@ namespace PollAwards.Services
       Poll poll = await DbContext.Polls.
         Include(p => p.Status).
         Include(p => p.PollOptions).
+        //Include(p => p.UserVotes).
         //Include(p => p.PollOptions.Select(po => po.Id)).
         //Include(p => p.PollOptions.Select(po => po.Content)).
         //Include(p => p.PollOptions.Select(po => po.Votes)).

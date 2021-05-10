@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
@@ -22,6 +23,7 @@ namespace ArtistAwards
 
         public virtual PollStatus Status { get; set; }
         public virtual ICollection<PollOption> PollOptions { get; set; }
+        [JsonIgnore]
         public virtual ICollection<UserVotes> UserVotes { get; set; }
     }
 }
