@@ -31,26 +31,45 @@ namespace ArtistAwards.Controllers
     private IConfiguration Config { get; }
     private UserService UserService;
     private AppDbContext DbContext;
+    private Regex EmailRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
 
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel model)
     {
-      Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-      Match emailMatch = regex.Match(model.Email);
-
-      if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
-      {
-        return BadRequest(new { message = "Email and Password must be filled" });
-      }
-      if (!emailMatch.Success)
-      {
-        return BadRequest(new { message = "Invalid Email" });
-      }
-
+      ValidateAuthModel(model);
       var user = UserService.AuthenticateUser(model.Email, model.Password);
       if (user == null)
         return BadRequest(new { message = "Email or Password is incorrect" });
 
+      SetAuthTokens(user);
+
+      return Ok();
+    }
+
+    [HttpPost, Route("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    {
+      ValidateAuthModel(model);
+
+      var user = new User { Name = model.Name, Email = model.Email };
+      string passwordHash = BC.HashPassword(model.Password);
+      user.Passwordhash = passwordHash;
+      User checkUser = DbContext.Users.SingleOrDefault(u => u.Email == user.Email);
+      if (checkUser != null)
+      {
+        return BadRequest(new { message = "User already exists" });
+      }
+      await UserService.CreateUser(user);
+
+      return Ok();
+    }
+
+    /*
+     * Helper methods
+     */
+
+    public void SetAuthTokens(User user)
+    {
       var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
       var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
       var roles = UserService.GetUserRoles(user.Id);
@@ -71,54 +90,44 @@ namespace ArtistAwards.Controllers
       var cookieOptions = new CookieOptions
       {
         HttpOnly = true,
-        Expires = DateTime.Now.AddMinutes(1),
-        //Expires = DateTime.UtcNow.AddDays(7)
+        Expires = DateTime.UtcNow.AddDays(1)
       };
       Response.Cookies.Append("token", tokenString, cookieOptions);
-      //return Ok(new { Token = tokenString });
-      return Ok();
-
-
     }
 
-    [HttpPost, Route("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterModel model)
+    public BadRequestObjectResult ValidateAuthModel(AuthModel model)
     {
-      Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
-      Match emailMatch = regex.Match(model.Email);
+      Match emailMatch = EmailRegex.Match(model.Email);
 
-      if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.Name))
+      if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
       {
-        return BadRequest(new { message = "Name, Email, and Password must be filled" });
+        return BadRequest(new { message = "Email and Password must be filled" });
       }
       if (!emailMatch.Success)
       {
         return BadRequest(new { message = "Invalid Email" });
       }
 
-      var user = new User { Name = model.Name, Email = model.Email };
-      string passwordHash = BC.HashPassword(model.Password);
-      user.Passwordhash = passwordHash;
-      User checkUser = DbContext.Users.SingleOrDefault(u => u.Email == user.Email);
-      if (checkUser != null)
-      {
-        return BadRequest(new { message = "User already exists" });
-      }
-
-      await UserService.CreateUser(user);
-
-      return Ok();
+      return null;
     }
   }
 
 
-  public class LoginModel
+
+ 
+  public interface AuthModel 
   {
     public string Email { get; set; }
     public string Password { get; set; }
   }
 
-  public class RegisterModel
+  public class LoginModel : AuthModel
+  {
+    public string Email { get; set; }
+    public string Password { get; set; }
+  }
+
+  public class RegisterModel : AuthModel
   {
     public string Name { get; set; }
     public string Email { get; set; }
