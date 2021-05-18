@@ -60,15 +60,23 @@ namespace ArtistAwards.Controllers
         var claim = new Claim(ClaimTypes.Role, role.Name);
         claims.Add(claim);
       }
-      var tokeOptions = new JwtSecurityToken(
+      var tokenOptions = new JwtSecurityToken(
           issuer: "http://localhost:5000",
           audience: "http://localhost:5000",
           claims: claims,
-          expires: DateTime.Now.AddMinutes(120),
+          expires: DateTime.Now.AddMinutes(1),
           signingCredentials: signinCredentials
       );
-      var tokenString = new JwtSecurityTokenHandler().WriteToken(tokeOptions);
-      return Ok(new { Token = tokenString });
+      var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+      var cookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Expires = DateTime.Now.AddMinutes(1),
+        //Expires = DateTime.UtcNow.AddDays(7)
+      };
+      Response.Cookies.Append("token", tokenString, cookieOptions);
+      //return Ok(new { Token = tokenString });
+      return Ok();
 
 
     }

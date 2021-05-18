@@ -60,6 +60,15 @@ namespace DotNetAPI
         ValidAudience = "http://localhost:5000",
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration.GetValue<string>("SecretKey")))
       };
+
+      options.Events = new JwtBearerEvents
+      {
+        OnMessageReceived = context =>
+        {
+          context.Token = context.Request.Cookies["token"];
+          return Task.CompletedTask;
+        }
+      };
     });
 
       services.AddCors(options =>
