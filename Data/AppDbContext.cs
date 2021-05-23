@@ -184,6 +184,25 @@ namespace ArtistAwards.Data
             .HasConstraintName("user_votes_poll_option_id_fkey");
       });
 
+      modelBuilder.Entity<RefreshToken>(entity =>
+      {
+        entity.ToTable("refresh_tokens");
+
+        entity.Property(e => e.Id)
+            .HasColumnName("id")
+            .UseIdentityAlwaysColumn();
+
+        entity.Property(e => e.Expires).HasColumnName("expires");
+
+        entity.Property(e => e.IsActive).HasColumnName("is_active");
+
+        entity.Property(e => e.Token)
+            .IsRequired()
+            .HasColumnName("token")
+            .HasColumnType("character varying");
+      });
+
+
       //OnModelCreatingPartial(modelBuilder);
     }
     //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
