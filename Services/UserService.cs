@@ -71,13 +71,21 @@ namespace ArtistAwards.Services
       return new AuthResponse(user, accessToken, refreshToken.Token);
     }
 
-
-    public IEnumerable<Role> GetUserRoles(int userId)
+    public bool LogOut(string accessToken, string refreshToken)
     {
-      var userRoleIds =  ArtistContext.Userroles.Where(ur => ur.Userid == userId).Select(ur => ur.Roleid).ToList();
-      var userRoles = ArtistContext.Roles.Where(r => userRoleIds.Contains(r.Id)).ToList();
-      return userRoles;
-    }
+      var result = false;
+      var refreshTokenCheck = ArtistContext.RefreshTokens.SingleOrDefault(rt => rt.Token == refreshToken);
+      if(refreshTokenCheck == null || refreshTokenCheck.IsActive == false) {   }
+      else
+      {
+        refreshTokenCheck.IsActive = false;
+        ArtistContext.Update(refreshTokenCheck);
+        ArtistContext.SaveChanges();
+        result = true;
+      }
+      return result;
+    } 
+
 
 
 
@@ -92,6 +100,13 @@ namespace ArtistAwards.Services
     //}
 
 
+
+    public IEnumerable<Role> GetUserRoles(int userId)
+    {
+      var userRoleIds = ArtistContext.Userroles.Where(ur => ur.Userid == userId).Select(ur => ur.Roleid).ToList();
+      var userRoles = ArtistContext.Roles.Where(r => userRoleIds.Contains(r.Id)).ToList();
+      return userRoles;
+    }
 
     private string generateJwtToken(User user)
     {

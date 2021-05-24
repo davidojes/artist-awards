@@ -65,6 +65,16 @@ namespace ArtistAwards.Controllers
       return Ok();
     }
 
+    [HttpPost, Route("logout")]
+    public IActionResult Logout()
+    {
+      var accessToken = Request.Cookies["accessToken"];
+      var refreshToken = Request.Cookies["refreshToken"];
+      var result = UserService.LogOut(accessToken, refreshToken);
+      if (result == false) { return BadRequest(new { message = "We encountered an error while trying to log you out" }); }
+      else { UnsetAuthTokens(); return Ok(); }
+    }
+
     /*
      * Helper methods
      */
@@ -88,6 +98,19 @@ namespace ArtistAwards.Controllers
       Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
     }
 
+    public void UnsetAuthTokens()
+    {
+
+      var cookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Expires = DateTime.UtcNow.AddDays(1)
+      };
+
+      Response.Cookies.Append("accessToken", "invalid", cookieOptions);
+      Response.Cookies.Append("refreshToken", "invalid", cookieOptions);
+    }
+
     public BadRequestObjectResult ValidateAuthModel(AuthModel model)
     {
       Match emailMatch = EmailRegex.Match(model.Email);
@@ -107,8 +130,8 @@ namespace ArtistAwards.Controllers
 
 
 
- 
-  public interface AuthModel 
+
+  public interface AuthModel
   {
     public string Email { get; set; }
     public string Password { get; set; }
