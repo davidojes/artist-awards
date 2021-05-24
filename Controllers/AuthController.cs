@@ -1,4 +1,5 @@
 ﻿using ArtistAwards.Data;
+using ArtistAwards.Helper_Models;
 using ArtistAwards.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -37,11 +38,11 @@ namespace ArtistAwards.Controllers
     public IActionResult Login([FromBody] LoginModel model)
     {
       ValidateAuthModel(model);
-      var user = UserService.AuthenticateUser(model.Email, model.Password);
-      if (user == null)
+      var response = UserService.AuthenticateUser(model.Email, model.Password);
+      if (response == null)
         return BadRequest(new { message = "Email or Password is incorrect" });
 
-      SetAuthTokens(user);
+      SetAuthTokens(response);
 
       return Ok();
     }
@@ -68,31 +69,23 @@ namespace ArtistAwards.Controllers
      * Helper methods
      */
 
-    public void SetAuthTokens(User user)
+    public void SetAuthTokens(AuthResponse response)
     {
-      var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
-      var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
-      var roles = UserService.GetUserRoles(user.Id);
-      var claims = new List<Claim>();
-      foreach (Role role in roles)
-      {
-        var claim = new Claim(ClaimTypes.Role, role.Name);
-        claims.Add(claim);
-      }
-      var tokenOptions = new JwtSecurityToken(
-          issuer: "http://localhost:5000",
-          audience: "http://localhost:5000",
-          claims: claims,
-          expires: DateTime.Now.AddMinutes(1),
-          signingCredentials: signinCredentials
-      );
-      var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-      var cookieOptions = new CookieOptions
+
+      var accessCookieOptions = new CookieOptions
       {
         HttpOnly = true,
         Expires = DateTime.UtcNow.AddDays(1)
       };
-      Response.Cookies.Append("token", tokenString, cookieOptions);
+
+      var refreshCookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Expires = DateTime.UtcNow.AddDays(30)
+      };
+
+      Response.Cookies.Append("accessToken", response.JwtToken, accessCookieOptions);
+      Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
     }
 
     public BadRequestObjectResult ValidateAuthModel(AuthModel model)

@@ -25,6 +25,7 @@ namespace ArtistAwards.Data
     public virtual DbSet<PollStatus> PollStatuses { get; set; }
     public virtual DbSet<Poll> Polls { get; set; }
     public virtual DbSet<UserVotes> UserVotes { get; set; }
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,6 +73,10 @@ namespace ArtistAwards.Data
       modelBuilder.Entity<User>(entity =>
       {
         entity.ToTable("users");
+
+        entity.HasIndex(e => e.Email)
+            .HasName("users_email_key")
+            .IsUnique();
 
         entity.Property(e => e.Id).HasColumnName("id");
 
@@ -200,6 +205,14 @@ namespace ArtistAwards.Data
             .IsRequired()
             .HasColumnName("token")
             .HasColumnType("character varying");
+
+        entity.Property(e => e.UserId).HasColumnName("user_id");
+
+        entity.HasOne(d => d.User)
+            .WithMany(p => p.RefreshTokens)
+            .HasForeignKey(d => d.UserId)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("refreshtokens_users_fkey");
       });
 
 

@@ -65,7 +65,7 @@ namespace DotNetAPI
       {
         OnMessageReceived = context =>
         {
-          context.Token = context.Request.Cookies["token"];
+          context.Token = context.Request.Cookies["accessToken"];
           return Task.CompletedTask;
         }
       };

@@ -15,5 +15,8 @@ namespace ArtistAwards
     public DateTime Expires { get; set; }
     public bool IsExpired => DateTime.UtcNow >= Expires;
     public bool IsActive { get; set; }
+    public int UserId { get; set; }
+
+    public virtual User User { get; set; }
   }
 }

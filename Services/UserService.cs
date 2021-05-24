@@ -1,11 +1,18 @@
 ﻿using ArtistAwards.Data;
+using ArtistAwards.Helper_Models;
 using DotNetAPI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BC = BCrypt.Net.BCrypt;
@@ -14,13 +21,15 @@ namespace ArtistAwards.Services
 {
   public class UserService
   {
-    public UserService( AppDbContext context)
+    public UserService( AppDbContext context, IConfiguration configuration)
     {
       ArtistContext = context;
+      Config = configuration;
     }
 
     private AppDbContext ArtistContext;
     private IEnumerable<User> Users;
+    private IConfiguration Config { get; }
 
     public IEnumerable<User> GetUsers()
     {
@@ -46,19 +55,20 @@ namespace ArtistAwards.Services
       return user;
     }
 
-    public User AuthenticateUser(string email, string password)
+    public AuthResponse AuthenticateUser(string email, string password)
     {
       var user =  ArtistContext.Users.SingleOrDefault(u => u.Email == email);
+      if(user == null || !BC.Verify(password, user.Passwordhash)) return null;
 
-      if(user == null)
-      {
-        return null;
-      }
+      var accessToken = generateJwtToken(user);
+      var refreshToken = generateRefreshToken();
+      refreshToken.UserId = user.Id;
+      ArtistContext.RefreshTokens.Add(refreshToken);
+      //user.RefreshTokens.Add(refreshToken);
+      //ArtistContext.Update(user);
+      ArtistContext.SaveChanges();
 
-      if (!BC.Verify(password, user.Passwordhash))
-        return null;
-
-      return user;
+      return new AuthResponse(user, accessToken, refreshToken.Token);
     }
 
 
@@ -80,6 +90,45 @@ namespace ArtistAwards.Services
 
     //  await ArtistContext.SaveChangesAsync();
     //}
+
+
+
+    private string generateJwtToken(User user)
+    {
+      var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Config.GetValue<string>("SecretKey")));
+      var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+      var roles = GetUserRoles(user.Id);
+      var claims = new List<Claim>();
+      foreach (Role role in roles)
+      {
+        var claim = new Claim(ClaimTypes.Role, role.Name);
+        claims.Add(claim);
+      }
+      var tokenOptions = new JwtSecurityToken(
+          issuer: "http://localhost:5000",
+          audience: "http://localhost:5000",
+          claims: claims,
+          expires: DateTime.Now.AddMinutes(1),
+          signingCredentials: signinCredentials
+      );
+      var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+      return tokenString;
+    }
+
+    private RefreshToken generateRefreshToken()
+    {
+      using (var rngCryptoServiceProvider = new RNGCryptoServiceProvider())
+      {
+        var randomBytes = new byte[64];
+        rngCryptoServiceProvider.GetBytes(randomBytes);
+        return new RefreshToken
+        {
+          Token = Convert.ToBase64String(randomBytes),
+          Expires = DateTime.UtcNow.AddDays(7),
+          IsActive = true
+        };
+      }
+    }
 
   }
 }
