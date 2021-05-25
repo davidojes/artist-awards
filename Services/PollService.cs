@@ -45,14 +45,27 @@ namespace PollAwards.Services
       return poll;
     }
 
-    //public async Task VoteAsync(int id)
-    //{
+    public bool Vote(int userId, int pollOptionId)
+    {
+      var result = false;
+      var user = DbContext.Users.SingleOrDefault(u => u.Id == userId);
+      if (user == null) return result;
+      var pollOption = DbContext.PollOptions.SingleOrDefault(po => po.Id == pollOptionId);
+      if (pollOption == null) return result;
+      var poll = DbContext.Polls.SingleOrDefault(p => p.Id == pollOption.PollId);
+      if (poll == null || poll.StatusId != 1) return result;
+      var checkHasVoted = DbContext.UserVotes.SingleOrDefault(uv => uv.UserId == userId && uv.PollId == poll.Id);
+      if (checkHasVoted != null) return result;
 
-    //  Poll PollToVote = await DbContext.Polls.FindAsync(id);
-    //  PollToVote.Votes += 1;
+      var newVote = new UserVotes {PollId = poll.Id, UserId = user.Id, PollOptionId = pollOption.Id };
+      pollOption.Votes += 1;
+      DbContext.UserVotes.Add(newVote);
+      DbContext.Update(pollOption);
+      DbContext.SaveChanges();
 
-    //  await DbContext.SaveChangesAsync();
-    //}
+      result = true;
+      return result;
+    }
 
   }
 }

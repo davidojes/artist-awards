@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using PollAwards.Services;
 using Microsoft.AspNetCore.Authorization;
 using ArtistAwards;
+using ArtistAwards.HelperModels;
 
 namespace DotNetAPI
 {
@@ -48,13 +49,15 @@ namespace DotNetAPI
       return poll;
     }
 
-    //[Route("vote")]
-    //[HttpPost, Authorize(Roles = "voter")]
-    //public async Task<StatusCodeResult> VoteAsync([FromBody] Poll poll)
-    //{
-    //  await PollService.VoteAsync(poll.Id);
-    //  return Ok();
+    [Route("vote")]
+    [HttpPost, Authorize(Roles = "voter")]
+    public IActionResult Vote([FromBody] VoteRequest voteRequest)
+    {
+      var result = PollService.Vote(voteRequest.UserId, voteRequest.PollOptionId);
 
-    //}
+      if (result == false) { return BadRequest(new { message = "Your vote could not be completed" }); }
+      else { return Ok("Your vote was completed"); }
+
+    }
   }
 }
