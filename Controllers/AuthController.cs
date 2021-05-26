@@ -101,14 +101,20 @@ namespace ArtistAwards.Controllers
     public void UnsetAuthTokens()
     {
 
-      var cookieOptions = new CookieOptions
+      var accessCookieOptions = new CookieOptions
       {
-        HttpOnly = true,
-        Expires = DateTime.UtcNow.AddDays(1)
+        HttpOnly = false,
+        Expires = DateTime.UtcNow.AddMinutes(15)
       };
 
-      Response.Cookies.Append("accessToken", "invalid", cookieOptions);
-      Response.Cookies.Append("refreshToken", "invalid", cookieOptions);
+      var refreshCookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Expires = DateTime.UtcNow.AddDays(30)
+      };
+
+      Response.Cookies.Append("accessToken", "invalid", accessCookieOptions);
+      Response.Cookies.Append("refreshToken", "invalid", refreshCookieOptions);
     }
 
     public BadRequestObjectResult ValidateAuthModel(AuthModel model)
