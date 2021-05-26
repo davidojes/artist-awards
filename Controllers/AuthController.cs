@@ -84,7 +84,7 @@ namespace ArtistAwards.Controllers
 
       var accessCookieOptions = new CookieOptions
       {
-        HttpOnly = true,
+        HttpOnly = false,
         Expires = DateTime.UtcNow.AddDays(1)
       };
 
