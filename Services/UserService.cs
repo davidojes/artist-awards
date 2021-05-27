@@ -120,7 +120,9 @@ namespace ArtistAwards.Services
         claims.Add(claim);
       }
       var idClaim = new Claim(ClaimTypes.Sid, user.Id.ToString());
+      var nameClaim = new Claim(ClaimTypes.Name, user.Name);
       claims.Add(idClaim);
+      claims.Add(nameClaim);
       var tokenOptions = new JwtSecurityToken(
           issuer: "http://localhost:5000",
           audience: "http://localhost:5000",
