@@ -108,13 +108,17 @@ namespace ArtistAwards.Controllers
       var accessCookieOptions = new CookieOptions
       {
         HttpOnly = false,
-        Expires = DateTime.UtcNow.AddMinutes(15)
+        Expires = DateTime.UtcNow.AddMinutes(15),
+        SameSite = SameSiteMode.None,
+        Secure = false
       };
 
       var refreshCookieOptions = new CookieOptions
       {
         HttpOnly = true,
-        Expires = DateTime.UtcNow.AddDays(30)
+        Expires = DateTime.UtcNow.AddDays(30),
+        SameSite = SameSiteMode.None,
+        Secure = false
       };
 
       Response.Cookies.Append("accessToken", "invalid", accessCookieOptions);
