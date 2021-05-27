@@ -75,9 +75,10 @@ namespace DotNetAPI
       {
         options.AddPolicy("EnableCORS", builder =>
         {
-          builder.AllowAnyOrigin()
+          builder.WithOrigins("http://localhost:4200")
              .AllowAnyHeader()
-             .AllowAnyMethod();
+             .AllowAnyMethod()
+             .AllowCredentials();
         });
       });
 
