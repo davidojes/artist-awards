@@ -23,7 +23,7 @@ namespace ArtistAwards
 
         public virtual PollStatus Status { get; set; }
         public virtual ICollection<PollOption> PollOptions { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public virtual ICollection<UserVotes> UserVotes { get; set; }
     }
 }

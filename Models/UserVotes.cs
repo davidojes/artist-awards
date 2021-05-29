@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
 // If you have enabled NRTs for your project, then un-comment the following line:
@@ -10,7 +10,9 @@ namespace ArtistAwards
 {
   public partial class UserVotes
   {
+    [JsonIgnore]
     public int Id { get; set; }
+    [JsonIgnore]
     public Guid PollId { get; set; }
     public int UserId { get; set; }
     public int PollOptionId { get; set; }
