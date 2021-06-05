@@ -19,6 +19,7 @@ using System.Text;
 using ArtistAwards;
 using Microsoft.AspNetCore.Identity;
 using PollAwards.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace DotNetAPI
 {
@@ -35,6 +36,7 @@ namespace DotNetAPI
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddControllers();
+      services.AddHttpContextAccessor();
       services.AddTransient<ArtistService>();
       services.AddTransient<UserService>();
       services.AddTransient<PollService>();
@@ -42,6 +44,13 @@ namespace DotNetAPI
       services.AddDbContext<AppDbContext>(options =>
               options.UseNpgsql(Configuration.GetConnectionString("ArtistContext")));
 
+
+      services.Configure<CookiePolicyOptions>(options =>
+      {
+        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+        options.CheckConsentNeeded = context => true;
+        options.MinimumSameSitePolicy = SameSiteMode.None;
+      });
       //Authentication
       services.AddAuthentication(opt =>
       {
@@ -75,7 +84,9 @@ namespace DotNetAPI
       {
         options.AddPolicy("EnableCORS", builder =>
         {
-          builder.WithOrigins("http://localhost:4200")
+          builder.
+          SetIsOriginAllowed(origin => true)
+          //WithOrigins("http://localhost:4200")
              .AllowAnyHeader()
              .AllowAnyMethod()
              .AllowCredentials();

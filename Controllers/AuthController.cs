@@ -22,17 +22,19 @@ namespace ArtistAwards.Controllers
   [ApiController]
   public class AuthController : ControllerBase
   {
-    public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext)
+    public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
       Config = configuration;
       UserService = userService;
       DbContext = dbContext;
+      HttpContextAccessor = httpContextAccessor;
     }
 
     private IConfiguration Config { get; }
     private UserService UserService;
     private AppDbContext DbContext;
     private Regex EmailRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+    private IHttpContextAccessor HttpContextAccessor;
 
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel model)
@@ -105,24 +107,29 @@ namespace ArtistAwards.Controllers
     public void UnsetAuthTokens()
     {
 
-      var accessCookieOptions = new CookieOptions
-      {
-        HttpOnly = false,
-        Expires = DateTime.UtcNow.AddMinutes(15),
-        SameSite = SameSiteMode.None,
-        Secure = false
-      };
+      Response.Cookies.Delete("accessToken");
+      Response.Cookies.Delete("refreshToken");
 
-      var refreshCookieOptions = new CookieOptions
-      {
-        HttpOnly = true,
-        Expires = DateTime.UtcNow.AddDays(30),
-        SameSite = SameSiteMode.None,
-        Secure = false
-      };
+      //var accessCookieOptions = new CookieOptions
+      //{
+      //  HttpOnly = false,
+      //  Expires = DateTime.UtcNow.AddMinutes(15),
+      //  SameSite = SameSiteMode.None,
+      //  Secure = false,
+      //  IsEssential = true
+      //};
 
-      Response.Cookies.Append("accessToken", "invalid", accessCookieOptions);
-      Response.Cookies.Append("refreshToken", "invalid", refreshCookieOptions);
+      //var refreshCookieOptions = new CookieOptions
+      //{
+      //  HttpOnly = true,
+      //  Expires = DateTime.UtcNow.AddDays(30),
+      //  SameSite = SameSiteMode.None,
+      //  Secure = false,
+      //  IsEssential = true
+      //};
+
+      //Response.Cookies.Append("accessToken", "invalid", accessCookieOptions);
+      //Response.Cookies.Append("refreshToken", "invalid", refreshCookieOptions);
     }
 
     public BadRequestObjectResult ValidateAuthModel(AuthModel model)
