@@ -21,7 +21,7 @@ namespace ArtistAwards.Services
 {
   public class UserService
   {
-    public UserService( AppDbContext context, IConfiguration configuration)
+    public UserService(AppDbContext context, IConfiguration configuration)
     {
       ArtistContext = context;
       Config = configuration;
@@ -44,7 +44,7 @@ namespace ArtistAwards.Services
     }
 
     public async Task<User> CreateUser(User user)
-    {     
+    {
       ArtistContext.Users.Add(user);
       await ArtistContext.SaveChangesAsync();
       User registeredUser = ArtistContext.Users.SingleOrDefault(u => u.Email == user.Email);
@@ -57,8 +57,8 @@ namespace ArtistAwards.Services
 
     public AuthResponse AuthenticateUser(string email, string password)
     {
-      var user =  ArtistContext.Users.SingleOrDefault(u => u.Email == email);
-      if(user == null || !BC.Verify(password, user.Passwordhash)) return null;
+      var user = ArtistContext.Users.SingleOrDefault(u => u.Email == email);
+      if (user == null || !BC.Verify(password, user.Passwordhash)) return null;
 
       var accessToken = generateJwtToken(user);
       var refreshToken = generateRefreshToken();
@@ -75,7 +75,7 @@ namespace ArtistAwards.Services
     {
       var result = false;
       var refreshTokenCheck = ArtistContext.RefreshTokens.SingleOrDefault(rt => rt.Token == refreshToken);
-      if(refreshTokenCheck == null || refreshTokenCheck.IsActive == false) {   }
+      if (refreshTokenCheck == null || refreshTokenCheck.IsActive == false) { }
       else
       {
         refreshTokenCheck.IsActive = false;
@@ -84,7 +84,18 @@ namespace ArtistAwards.Services
         result = true;
       }
       return result;
-    } 
+    }
+
+    public AuthResponse RefreshToken(string refreshToken)
+    {
+      var refreshTokenCheck = ArtistContext.RefreshTokens.Include(rt => rt.User).SingleOrDefault(rt => rt.Token == refreshToken);
+      if (refreshTokenCheck == null || refreshTokenCheck.IsActive == false) { return null; }
+
+      var user = refreshTokenCheck.User;
+      var newAccessToken = generateJwtToken(user);
+
+      return new AuthResponse(user, newAccessToken, refreshToken);
+    }
 
 
 
@@ -127,7 +138,7 @@ namespace ArtistAwards.Services
           issuer: "http://localhost:5000",
           audience: "http://localhost:5000",
           claims: claims,
-          expires: DateTime.Now.AddMinutes(15),
+          expires: DateTime.Now.AddMinutes(1),
           signingCredentials: signinCredentials
       );
       var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);

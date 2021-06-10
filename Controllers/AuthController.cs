@@ -77,11 +77,23 @@ namespace ArtistAwards.Controllers
       else { UnsetAuthTokens(); return Ok(); }
     }
 
-    /*
-     * Helper methods
-     */
+    [HttpPost, Route("refreshtoken")]
+    public IActionResult RefreshToken()
+    {
+      var refreshToken = Request.Cookies["refreshToken"];
+      if (refreshToken == null) { return BadRequest(new { message = "User has been logged out" }); }
+      var result = UserService.RefreshToken(refreshToken);
+      if (result == null) { UnsetAuthTokens(); return BadRequest(new { message = "User has been logged out" }); }
 
-    public void SetAuthTokens(AuthResponse response)
+      SetAuthTokens(result);
+      return Ok();
+    }
+
+      /*
+       * Helper methods
+       */
+
+      public void SetAuthTokens(AuthResponse response)
     {
 
       var accessCookieOptions = new CookieOptions
