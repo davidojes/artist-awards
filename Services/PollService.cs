@@ -67,5 +67,11 @@ namespace PollAwards.Services
       return result;
     }
 
+    public bool CheckForPoll(Guid pollId)
+    {
+      var result = DbContext.Polls.Any(p => p.Id == pollId);
+      return result;
+    }
+
   }
 }

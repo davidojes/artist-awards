@@ -59,5 +59,15 @@ namespace DotNetAPI
       else { return Ok("Your vote was completed"); }
 
     }
+
+    //[Route("checkforpoll")]
+    [RouteAttribute("checkforpoll/{pollId:Guid}")]
+    [HttpGet]
+    public bool CheckForPoll(Guid pollId)
+    {
+      var result = PollService.CheckForPoll(pollId);
+      return result;
+    }
+
   }
 }
