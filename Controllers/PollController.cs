@@ -35,15 +35,19 @@ namespace DotNetAPI
     [HttpGet]
     public async Task<Poll> GetPoll(Guid id)
     {
-      Poll poll =  await PollService.GetPoll(id);
+      Poll poll = await PollService.GetPoll(id);
       return poll;
       //string pollsJson = JsonSerializer.Serialize(PollService.GetPolls());
       //return pollsJson;
     }
 
-    [HttpPost, Authorize(Roles = "manager")]
+    [Route("createpoll")]
+    //[HttpPost, Authorize(Roles = "voter")]
+    [HttpPost]
     public async Task<Poll> CreatePoll([FromBody] Poll poll)
     {
+
+
       await PollService.CreatePoll(poll);
 
       return poll;
