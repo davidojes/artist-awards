@@ -42,7 +42,7 @@ namespace DotNetAPI
     }
 
     [Route("createpoll")]
-    //[HttpPost, Authorize(Roles = "voter")]
+    [HttpPost, Authorize(Roles = "voter")]
     [HttpPost]
     public async Task<Poll> CreatePoll([FromBody] Poll poll)
     {
