@@ -73,5 +73,12 @@ namespace DotNetAPI
       return result;
     }
 
+    [Route("popularpolls")]
+    [HttpGet]
+    public IEnumerable<Poll> GetPopularPolls()
+    {
+      return PollService.GetPopularPolls();
+    }
+
   }
 }

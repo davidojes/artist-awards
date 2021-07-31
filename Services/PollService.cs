@@ -73,5 +73,12 @@ namespace PollAwards.Services
       return result;
     }
 
+    public IEnumerable<Poll> GetPopularPolls()
+    {
+      var polls = DbContext.Polls.Take(10);
+
+      return polls;
+    }
+
   }
 }
