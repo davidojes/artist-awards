@@ -62,7 +62,8 @@ namespace ArtistAwards.Controllers
       {
         return BadRequest(new { message = "User already exists" });
       }
-      await UserService.CreateUser(user);
+      var response = await UserService.CreateUser(user);
+      SetAuthTokens(response);
 
       return Ok();
     }

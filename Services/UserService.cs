@@ -43,16 +43,21 @@ namespace ArtistAwards.Services
       return User;
     }
 
-    public async Task<User> CreateUser(User user)
+    public async Task<AuthResponse> CreateUser(User user)
     {
       ArtistContext.Users.Add(user);
       await ArtistContext.SaveChangesAsync();
       User registeredUser = ArtistContext.Users.SingleOrDefault(u => u.Email == user.Email);
       UserRole ur = new UserRole(1, registeredUser.Id);
       ArtistContext.Userroles.Add(ur);
-      await ArtistContext.SaveChangesAsync();
+      
+      var accessToken = generateJwtToken(registeredUser);
+      var refreshToken = generateRefreshToken();
+      refreshToken.UserId = user.Id;
+      ArtistContext.RefreshTokens.Add(refreshToken);
 
-      return user;
+      await ArtistContext.SaveChangesAsync();
+      return new AuthResponse(registeredUser, accessToken, refreshToken.Token);
     }
 
     public AuthResponse AuthenticateUser(string email, string password)
