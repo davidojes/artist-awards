@@ -46,7 +46,7 @@ namespace ArtistAwards.Controllers
 
       SetAuthTokens(response);
 
-      return Ok();
+      return Ok(new { message = "Login successful" });
     }
 
     [HttpPost, Route("register")]
@@ -65,7 +65,7 @@ namespace ArtistAwards.Controllers
       var response = await UserService.CreateUser(user);
       SetAuthTokens(response);
 
-      return Ok();
+      return Ok(new { message = "Registration successful" });
     }
 
     [HttpPost, Route("logout")]
