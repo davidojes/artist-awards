@@ -22,12 +22,13 @@ namespace ArtistAwards.Controllers
   [ApiController]
   public class AuthController : ControllerBase
   {
-    public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+    public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, ConfigService configService)
     {
       Config = configuration;
       UserService = userService;
       DbContext = dbContext;
       HttpContextAccessor = httpContextAccessor;
+      ConfigService = configService;
     }
 
     private IConfiguration Config { get; }
@@ -35,6 +36,7 @@ namespace ArtistAwards.Controllers
     private AppDbContext DbContext;
     private Regex EmailRegex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
     private IHttpContextAccessor HttpContextAccessor;
+    private ConfigService ConfigService;
 
     [HttpPost, Route("login")]
     public IActionResult Login([FromBody] LoginModel model)
@@ -90,31 +92,34 @@ namespace ArtistAwards.Controllers
       return Ok();
     }
 
-      /*
-       * Helper methods
-       */
+    /*
+     * Helper methods
+     */
 
-      public void SetAuthTokens(AuthResponse response)
+    public void SetAuthTokens(AuthResponse response)
     {
 
-      var accessCookieOptions = new CookieOptions
-      {
-        HttpOnly = false,
-        Expires = DateTime.UtcNow.AddDays(1),
-        SameSite = SameSiteMode.None,
-        Secure = false
-      };
+      //var accessCookieOptions = new CookieOptions
+      //{
+      //  HttpOnly = false,
+      //  Expires = DateTime.UtcNow.AddDays(1),
+      //  SameSite = SameSiteMode.None,
+      //  Secure = false
+      //};
 
-      var refreshCookieOptions = new CookieOptions
-      {
-        HttpOnly = true,
-        Expires = DateTime.UtcNow.AddDays(30),
-        SameSite = SameSiteMode.None,
-        Secure = false
-      };
+      //var refreshCookieOptions = new CookieOptions
+      //{
+      //  HttpOnly = true,
+      //  Expires = DateTime.UtcNow.AddDays(30),
+      //  SameSite = SameSiteMode.None,
+      //  Secure = false
+      //};
 
-      Response.Cookies.Append("accessToken", response.JwtToken, accessCookieOptions);
-      Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
+      //Response.Cookies.Append("accessToken", response.JwtToken, accessCookieOptions);
+      //Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
+
+      Response.Cookies.Append("accessToken", response.JwtToken, ConfigService.AccessCookieOptions);
+      Response.Cookies.Append("refreshToken", response.RefreshToken, ConfigService.RefreshCookieOptions);
     }
 
     public void UnsetAuthTokens()

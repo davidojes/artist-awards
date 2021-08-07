@@ -19,10 +19,19 @@
     <Content Remove="Pages\Details.cshtml" />
     <Content Remove="Pages\Edit.cshtml" />
     <Content Remove="Pages\Index.cshtml" />
+    <Content Remove="Properties\example.launchSettings.json" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Pages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Properties\example.launchSettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
