@@ -118,15 +118,18 @@ namespace ArtistAwards.Controllers
       //Response.Cookies.Append("accessToken", response.JwtToken, accessCookieOptions);
       //Response.Cookies.Append("refreshToken", response.RefreshToken, refreshCookieOptions);
 
-      Response.Cookies.Append("accessToken", response.JwtToken, ConfigService.AccessCookieOptions);
-      Response.Cookies.Append("refreshToken", response.RefreshToken, ConfigService.RefreshCookieOptions);
+      Response.Cookies.Append("accessToken", response.JwtToken, ConfigService.GetAccessCookieOptions());
+      Response.Cookies.Append("refreshToken", response.RefreshToken, ConfigService.GetRefreshCookieOptions());
     }
 
     public void UnsetAuthTokens()
     {
 
-      Response.Cookies.Delete("accessToken");
-      Response.Cookies.Delete("refreshToken");
+      //Response.Cookies.Delete("accessToken");
+      //Response.Cookies.Delete("refreshToken");
+
+      Response.Cookies.Append("accessToken", "", ConfigService.GetLogoutAccessCookieOptions());
+      Response.Cookies.Append("refreshToken", "", ConfigService.GetLogoutRefreshCookieOptions());
 
       //var accessCookieOptions = new CookieOptions
       //{

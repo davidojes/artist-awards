@@ -12,60 +12,76 @@ namespace ArtistAwards.Services
   {
     public CookieOptions AccessCookieOptions { get; set; }
     public CookieOptions RefreshCookieOptions { get; set; }
+
+    //  public const CookieOptions LogoutAccessCookieOptions { get; set; }
+    //public const CookieOptions LogoutRefreshCookieOptions { get; set; }
     public IWebHostEnvironment Env { get; set; }
+    private bool CookieIsSecure = false;
 
     public ConfigService(IWebHostEnvironment env)
     {
       Env = env;
 
-      if (Env.IsDevelopment())
-      {
-        AccessCookieOptions = new CookieOptions
-        {
-          HttpOnly = false,
-          Expires = DateTime.UtcNow.AddDays(1),
-          SameSite = SameSiteMode.None,
-          Secure = false
-        };
+      if (Env.IsProduction()) CookieIsSecure = true;
 
-        RefreshCookieOptions = new CookieOptions
-        {
-          HttpOnly = true,
-          Expires = DateTime.UtcNow.AddDays(30),
-          SameSite = SameSiteMode.None,
-          Secure = false
-        };
-      }
-      else
-      {
-        AccessCookieOptions = new CookieOptions
-        {
-          HttpOnly = false,
-          Expires = DateTime.UtcNow.AddDays(1),
-          SameSite = SameSiteMode.None,
-          Secure = true,
-          Domain = "davidojes.dev"
-        };
 
-        RefreshCookieOptions = new CookieOptions
-        {
-          HttpOnly = true,
-          Expires = DateTime.UtcNow.AddDays(30),
-          SameSite = SameSiteMode.None,
-          Secure = true,
-          Domain = "davidojes.dev"
-        };
+    }
+
+
+    public void ConfigureAccessCookies(DateTimeOffset expires, bool httpOnly = false, string domain = "davidojes.dev", SameSiteMode sameSite = SameSiteMode.None)
+    {
+      AccessCookieOptions = new CookieOptions
+      {
+        HttpOnly = httpOnly,
+        Expires = expires,
+        SameSite = sameSite,
+        Secure = CookieIsSecure
+      };
+
+      if (Env.IsProduction())
+      {
+        AccessCookieOptions.Domain = domain;
       }
 
     }
 
+    public void ConfigureRefreshCookies(DateTimeOffset expires, bool secure = false, bool httpOnly = false, string domain = "davidojes.dev", SameSiteMode sameSite = SameSiteMode.None)
+    {
+      RefreshCookieOptions = new CookieOptions
+      {
+        HttpOnly = true,
+        Expires = expires,
+        SameSite = sameSite,
+        Secure = CookieIsSecure
+      };
+
+      if (Env.IsProduction())
+      {
+        RefreshCookieOptions.Domain = domain;
+      }
+    }
+
     public CookieOptions GetAccessCookieOptions()
     {
+      ConfigureAccessCookies(DateTime.UtcNow.AddDays(1));
+      return AccessCookieOptions;
+    }
+
+    public CookieOptions GetLogoutAccessCookieOptions()
+    {
+      ConfigureAccessCookies(DateTime.UtcNow.AddDays(-1));
       return AccessCookieOptions;
     }
 
     public CookieOptions GetRefreshCookieOptions()
     {
+      ConfigureRefreshCookies(DateTime.UtcNow.AddDays(30));
+      return RefreshCookieOptions;
+    }
+
+    public CookieOptions GetLogoutRefreshCookieOptions()
+    {
+      ConfigureRefreshCookies(DateTime.UtcNow.AddDays(-1));
       return RefreshCookieOptions;
     }
   }
