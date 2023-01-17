@@ -16,7 +16,9 @@ namespace ArtistAwards.Services
     //  public const CookieOptions LogoutAccessCookieOptions { get; set; }
     //public const CookieOptions LogoutRefreshCookieOptions { get; set; }
     public IWebHostEnvironment Env { get; set; }
-    private bool CookieIsSecure = false;
+    private bool CookieIsSecure = true;
+    private string domain = "davidojes.dev";
+    private SameSiteMode sameSite = SameSiteMode.None;
 
     public ConfigService(IWebHostEnvironment env)
     {
@@ -28,7 +30,7 @@ namespace ArtistAwards.Services
     }
 
 
-    public void ConfigureAccessCookies(DateTimeOffset expires, bool httpOnly = false, string domain = "davidojes.dev", SameSiteMode sameSite = SameSiteMode.None)
+    public void ConfigureAccessCookies(DateTimeOffset expires, bool httpOnly = false)
     {
       AccessCookieOptions = new CookieOptions
       {
@@ -45,11 +47,11 @@ namespace ArtistAwards.Services
 
     }
 
-    public void ConfigureRefreshCookies(DateTimeOffset expires, bool secure = false, bool httpOnly = false, string domain = "davidojes.dev", SameSiteMode sameSite = SameSiteMode.None)
+    public void ConfigureRefreshCookies(DateTimeOffset expires, bool httpOnly = true)
     {
       RefreshCookieOptions = new CookieOptions
       {
-        HttpOnly = true,
+        HttpOnly = httpOnly,
         Expires = expires,
         SameSite = sameSite,
         Secure = CookieIsSecure

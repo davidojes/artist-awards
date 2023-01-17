@@ -9,11 +9,13 @@ using PollAwards.Services;
 using Microsoft.AspNetCore.Authorization;
 using ArtistAwards;
 using ArtistAwards.HelperModels;
+using Microsoft.AspNetCore.Cors;
 
 namespace DotNetAPI
 {
   [Route("api/[controller]")]
   [ApiController]
+  [EnableCors("EnableCORS")]
   public class PollController : ControllerBase
   {
     public PollController(PollService _pollService)

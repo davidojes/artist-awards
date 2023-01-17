@@ -19,7 +19,7 @@ namespace ArtistAwards.Data
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<UserRole> Userroles { get; set; }
     public virtual DbSet<User> Users { get; set; }
-    public DbSet<Artist> Artists { get; set; }
+    //public DbSet<Artist> Artists { get; set; }
 
     public virtual DbSet<PollOption> PollOptions { get; set; }
     public virtual DbSet<PollStatus> PollStatuses { get; set; }
@@ -29,10 +29,10 @@ namespace ArtistAwards.Data
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      modelBuilder.Entity<Artist>().ToTable("Artists");
-      modelBuilder.Entity<Artist>()
-    .Property(e => e.Id)
-    .ValueGeneratedOnAdd();
+    //  modelBuilder.Entity<Artist>().ToTable("Artists");
+    //  modelBuilder.Entity<Artist>()
+    //.Property(e => e.Id)
+    //.ValueGeneratedOnAdd();
       //  modelBuilder.Entity<User>()
       //.Property(u => u.Id)
       //.ValueGeneratedOnAdd();

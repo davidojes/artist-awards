@@ -1,6 +1,7 @@
 ﻿using ArtistAwards.Data;
 using ArtistAwards.Helper_Models;
 using ArtistAwards.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,7 @@ namespace ArtistAwards.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [EnableCors("EnableCORS")]
   public class AuthController : ControllerBase
   {
     public AuthController(IConfiguration configuration, UserService userService, AppDbContext dbContext, IHttpContextAccessor httpContextAccessor, ConfigService configService)

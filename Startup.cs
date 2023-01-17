@@ -37,7 +37,7 @@ namespace DotNetAPI
     {
       services.AddControllers();
       services.AddHttpContextAccessor();
-      services.AddTransient<ArtistService>();
+      //services.AddTransient<ArtistService>();
       services.AddTransient<UserService>();
       services.AddTransient<PollService>();
       services.AddTransient<ConfigService>();
@@ -85,9 +85,9 @@ namespace DotNetAPI
       {
         options.AddPolicy("EnableCORS", builder =>
         {
-          builder.
-          SetIsOriginAllowed(origin => true)
-          //WithOrigins("http://localhost:4200")
+          builder
+          //.SetIsOriginAllowed(origin => true)
+          .WithOrigins("http://localhost:4200")
              .AllowAnyHeader()
              .AllowAnyMethod()
              .AllowCredentials();
@@ -112,10 +112,10 @@ namespace DotNetAPI
       app.UseHttpsRedirection();
 
       app.UseRouting();
-
+      app.UseCors("EnableCORS");
       app.UseAuthentication();
       app.UseAuthorization();
-      app.UseCors("EnableCORS");
+      
 
       app.UseEndpoints(endpoints =>
       {
