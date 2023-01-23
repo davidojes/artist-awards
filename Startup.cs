@@ -87,7 +87,7 @@ namespace DotNetAPI
         {
           builder
           //.SetIsOriginAllowed(origin => true)
-          .WithOrigins("http://localhost:4200")
+          .WithOrigins("http://localhost:4200", "https://pollarama.davidojes.dev")
              .AllowAnyHeader()
              .AllowAnyMethod()
              .AllowCredentials();
